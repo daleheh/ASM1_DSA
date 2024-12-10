@@ -79,12 +79,10 @@ public class StudentManagement {
             }
             students.add(student);
         }
-
         // Push back all students into the stack
         for (int i = students.size() - 1; i >= 0; i--) {
             studentStack.push(students.get(i));
         }
-
         if (foundStudent == null) {
             System.out.println("Student with ID " + id + " not found.");
         }
@@ -92,26 +90,148 @@ public class StudentManagement {
         return foundStudent;
     }
 
-    // Sort students by marks
-    public void sortStudentsByMarks() {
+     //MergeSort
+    public void mergeSortStudentsByMarks() {
+        ArrayList<Student> students = new ArrayList<>();
+
+        // Lấy tất cả sinh viên từ stack sang danh sách
+        while (!studentStack.isEmpty()) {
+            students.add(studentStack.pop());
+        }
+
+        // Sắp xếp danh sách bằng Merge Sort
+        students = mergeSort(students);
+
+        // Đẩy lại sinh viên vào stack
+        for (int i = students.size() - 1; i >= 0; i--) {
+            studentStack.push(students.get(i));
+        }
+    }
+
+    private ArrayList<Student> mergeSort(ArrayList<Student> students) {
+        if (students.size() <= 1) {
+            return students; // Nếu chỉ có 1 phần tử, danh sách đã được sắp xếp
+        }
+
+        // Chia danh sách thành hai nửa
+        int mid = students.size() / 2;
+        ArrayList<Student> left = new ArrayList<>(students.subList(0, mid));
+        ArrayList<Student> right = new ArrayList<>(students.subList(mid, students.size()));
+
+        // Gọi đệ quy để sắp xếp từng nửa
+        left = mergeSort(left);
+        right = mergeSort(right);
+
+        // Trộn hai danh sách đã sắp xếp
+        return merge(left, right);
+    }
+
+    private ArrayList<Student> merge(ArrayList<Student> left, ArrayList<Student> right) {
+        ArrayList<Student> merged = new ArrayList<>();
+        int i = 0, j = 0;
+
+        // Trộn hai danh sách dựa trên điểm số
+        while (i < left.size() && j < right.size()) {
+            if (left.get(i).getMarks() <= right.get(j).getMarks()) {
+                merged.add(left.get(i));
+                i++;
+            } else {
+                merged.add(right.get(j));
+                j++;
+            }
+        }
+
+        // Thêm các phần tử còn lại từ cả hai danh sách
+        while (i < left.size()) {
+            merged.add(left.get(i));
+            i++;
+        }
+        while (j < right.size()) {
+            merged.add(right.get(j));
+            j++;
+        }
+
+        return merged;
+    }
+
+    //quicksort
+
+
+    private void quickSort(ArrayList<Student> students, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(students, low, high);
+            quickSort(students, low, pivotIndex - 1);
+            quickSort(students, pivotIndex + 1, high);
+        }
+    }
+
+    private int partition(ArrayList<Student> students, int low, int high) {
+        double pivot = students.get(high).getMarks();
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            if (students.get(j).getMarks() < pivot) {
+                i++;
+                // Swap
+                Student temp = students.get(i);
+                students.set(i, students.get(j));
+                students.set(j, temp);
+            }
+        }
+
+        // Swap pivot
+        Student temp = students.get(i + 1);
+        students.set(i + 1, students.get(high));
+        students.set(high, temp);
+
+        return i + 1;
+    }
+
+    public void quickSortStudentsByMarks() {
+        ArrayList<Student> students = new ArrayList<>();
+
+        // Pop all students from stack into a list
+        while (!studentStack.isEmpty()) {
+            students.add(studentStack.pop());
+        }
+
+        // Quick Sort
+        quickSort(students, 0, students.size() - 1);
+
+        // Push back students into the stack
+        for (int i = students.size() - 1; i >= 0; i--) {
+            studentStack.push(students.get(i));
+        }
+    }
+
+    // Display all students
+    public void displayStudents() {
+        ArrayList<Student> students = new ArrayList<>();
+
+        // Lấy toàn bộ dữ liệu từ stack sang danh sách
+        while (!studentStack.isEmpty()) {
+            students.add(studentStack.pop());
+        }
+
+        // Đẩy lại dữ liệu vào stack
+        for (int i = students.size() - 1; i >= 0; i--) {
+            studentStack.push(students.get(i));
+        }
+
+    }
+
+    public ArrayList<Student> getAllStudents() {
         ArrayList<Student> students = new ArrayList<>();
 
         while (!studentStack.isEmpty()) {
             students.add(studentStack.pop());
         }
 
-        Collections.sort(students, Comparator.comparingDouble(Student::getMarks));
-
-        // Push back all students into the stack in sorted order
         for (int i = students.size() - 1; i >= 0; i--) {
             studentStack.push(students.get(i));
         }
 
-        System.out.println("Students sorted by marks.");
-    }
-
-    // Display all students
-    public void displayStudents() {
-        studentStack.displayStack();
+        return students;
     }
 }
+
